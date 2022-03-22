@@ -15,18 +15,18 @@ using namespace std;
 //********* END **********//
 
 //******************* Variables *****************//
-// OLA TA VARIABLES EINAI GLOBAL, DEN EXO KSEKATHARISEI TI XREIAZETAI KAI TI OXI//
-// 8-BIT variables, den tis usaro akoma san uint_8 giati tis katalavainei san char kai den kanei sosta tis if()
-int moves[16][16] = {0}; //apothikeuoume tis kiniseis gia to traversal tou lavirinthou
-int pos_mov_1, pos_mov_2, pos_mov_3, pos_mov_4; //pithanes metakiniseis dosmenes apo to PID
-int next_x = 0, next_y = 0; //ti tha prostheso sto x,y gia na ipologiso to epomeno
-int final_path[256]; //to teliko monopati
-int next_move; //i epomeni kinisi pou tha ekteleso
-// normal variables
-int length = 1;//, comp_length; // metrisi mikous monopatiou
-int x = 0,y = 0; //metavlites metakinisis pano ston pinaka
-//int branch_x, branch_y; // simeio diakladosis
-//Compare manhattan gia elegxo ton if kai ekxorisi timis stin moves
+// 8-BIT variables, variables need to be changes to uint_8 to save space, cant be properly used with gcc due to it understanding them as char and failing the if()s
+// Variables are created in specific order due to the nature of C and the way its compiled in low level processors.
+// You lose some bytes if you place bigger var types before smaller ones: so the order is uint -> int -> float -> char etc.
+int moves[16][16] = {0};
+int pos_mov_1, pos_mov_2, pos_mov_3, pos_mov_4; 
+int next_x = 0, next_y = 0;
+int final_path[256];
+int next_move;
+int length = 1;//, comp_length; // length calculation
+int x = 0,y = 0; // Branching vars on the table
+//int branch_x, branch_y; // branching point
+//Compare manhattan for ifs
 int i = 0,j = 0;
 // decimal numbers
 float cmp_manhantan;
@@ -37,7 +37,7 @@ bool center_backtrack = false;
 //******************* END *********************//
 
 //*****************FUCNTIONS*******************//
-//mporei na xreiastei gia melontiki xrisi veltistopoiisis
+//Currently unused
 int choosing_path(int x_diff, int y_diff){
 	calculation = abs(7.5 - x) + abs(7.5 - y - 1);
 	if ( calculation <= cmp_manhantan && moves[x][y+1] != blocked_move)
@@ -52,13 +52,13 @@ int choosing_path(int x_diff, int y_diff){
 
 int main(){
     while( abs(15-(x-1+y)) != 1000){
-        cout << "Dose to possible movment 1:" ;
+        cout << "Povide possible movment 1:" ;
         cin  >> pos_mov_1;
-        cout << "Dose to possible movment 2:" ;
+        cout << "Povide possible movment 2:" ;
         cin  >> pos_mov_2;
-        cout << "Dose to possible movment 3:" ;
+        cout << "Povide possible movment 3:" ;
         cin  >> pos_mov_3;
-        cout << "Dose to possible movment 4:" ;
+        cout << "Povide possible movment 4:" ;
         cin  >> pos_mov_4; 
         
         cmp_manhantan = 100;
@@ -67,7 +67,7 @@ int main(){
 		deadend_backtrack = false;
 	if (deadend_backtrack == false)
 	{
-		// vasiki for epilogi kinisis
+		// Basic movment pickup
 		if (pos_mov_1 == 1)
 		{
 			if(moves[x-1][y] != blocked_move)
@@ -107,12 +107,12 @@ int main(){
 				next_x = 0, next_y = -1;
 			}
 		}
-		//elegxo an mporesa na epilekso kinisi, an den ta katafera tote energopoio to backtrack
+		// Checking if the movment can be picked, otherways enable backtrack
 		if (next_move != 0)
 		{
-			//energopoio to center_backtrack an exo vrei to kentro
-			//diaforopoiei tis sinartiseis kathos den svinei to monopati to opoio exo idi diasxisei
-			//panta otan eimai sto kentro tha exo epomeni kinisi, ara panta tha vlepei auto to komati
+			// Enabling center_backtrack if the center has been found
+			// diferentiate the functions becuase it doesnt erase the path that it created.
+			// when in the center, there is always a visible movement, e.g. the path that led us there!
 			if(abs(15-(x-1+y)) == 0){
 				center_backtrack = true;
 				next_move = 0;
@@ -124,8 +124,8 @@ int main(){
 				length++;
 			}
 		}
-		//an den vrisko epomeni kinisi energopoio to deadend backtrack, 
-		//to center kai to deadend mporoun na einai true tautoxrona
+		// If there is no next movment the deadend backtrack is enabled. 
+		// Center and deadend can be true at the same time, which doesnt make sense since in the center we always have movment.
 		else{
 			deadend_backtrack = true;
 			if(center_backtrack == false){moves[x][y] = blocked_move;}
@@ -153,7 +153,7 @@ int main(){
 			deadend_backtrack = false;
 		}
 
-//*****************OPTIKOPOIISI*******************//
+//***************** Primitive virtualization *******************//
 		cout << "    |";
 		cout<< "1" << " " << "|";
 		for(j=1;j<MAX_Y;j++){
@@ -174,7 +174,7 @@ int main(){
 				}
 			}
 			cout << "\n" ;
-//*****************TELOS*******************//
+//***************** END *******************//
 	}
 	}
 }
